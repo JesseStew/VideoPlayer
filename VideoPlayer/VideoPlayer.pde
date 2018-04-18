@@ -7,6 +7,8 @@ import processing.video.*;
 
 String fname = "Ready-Player-One.mp4";
 Movie m;
+boolean paused = false;
+float playSpeed = 1.0, mt;
 
 String srtName = "Ready-Player-One-Trailer-HD-English-French-Subtitles.srt";
 SubtitlePlayer sp;
@@ -21,8 +23,43 @@ void setup() {
 
 void draw() {
   image(m, 0, 0);
+  mt = m.time()*1000;
+  sp.printSubtitle(sp.subtitle);
 }
 
 void movieEvent(Movie m){
   m.read();
+}
+
+void mouseWheel (MouseEvent event){
+  if(playSpeed > 0){
+    playSpeed = playSpeed + event.getCount();
+    if(playSpeed == 0){
+      playSpeed = 1;
+    }
+  }else{
+    playSpeed = playSpeed + event.getCount();
+    if(playSpeed == 0){
+      playSpeed = -1;
+    }
+  }
+  println(playSpeed);
+  m.speed(playSpeed);
+}
+
+void keyReleased() {
+  if (key == 'p') {
+    //toggle pause
+    if (paused){
+      paused = false;
+      m.play();
+    }else{
+      paused = true;
+      m.pause();
+    }
+  } else if (key == 'r') {
+    //reverse play
+    playSpeed = -1*playSpeed;
+    m.speed(playSpeed);
+  }
 }
