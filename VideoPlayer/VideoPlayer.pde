@@ -19,12 +19,16 @@ void setup() {
   frameRate(30);
   m = new Movie(this, fname);
   m.play();
+  //println(sp.subtitle);
 }
 
 void draw() {
+  background(0);
   image(m, 0, 0);
   mt = m.time()*1000;
-  sp.printSubtitle(sp.subtitle);
+  //sp.printSubtitle(sp.subtitle);
+  textSize(24);
+  text(playSpeed, 550, 330);
 }
 
 void movieEvent(Movie m){
@@ -33,22 +37,21 @@ void movieEvent(Movie m){
 
 void mouseWheel (MouseEvent event){
   if(playSpeed > 0){
-    playSpeed = playSpeed + event.getCount();
-    if(playSpeed == 0){
-      playSpeed = 1;
-    }
-  }else{
-    playSpeed = playSpeed + event.getCount();
-    if(playSpeed == 0){
-      playSpeed = -1;
+    playSpeed = playSpeed + -1*(0.01*event.getCount());
+    playSpeed = Math.round(playSpeed * 100.0) / 100.0;  //Gets rid of extra decimal places
+    if(playSpeed < 0.1){
+      playSpeed = 0.1;
+    }else if(playSpeed > 2.0){
+      playSpeed = 2.0;
     }
   }
-  println(playSpeed);
-  m.speed(playSpeed);
+  //Speed seems to only change at multiples of .1 not .01
+  //println(playSpeed);
+  m.speed(playSpeed);  
 }
 
 void keyReleased() {
-  if (key == 'p') {
+  if (key == ' ') {
     //toggle pause
     if (paused){
       paused = false;
@@ -59,7 +62,11 @@ void keyReleased() {
     }
   } else if (key == 'r') {
     //reverse play
-    playSpeed = -1*playSpeed;
+    if(playSpeed > 0){
+      playSpeed = -1.0;
+    }else{
+      playSpeed = 0;
+    }
     m.speed(playSpeed);
   }
 }
