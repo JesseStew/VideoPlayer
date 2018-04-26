@@ -9,13 +9,15 @@ String fname = "Ready-Player-One.mp4";
 Movie m;
 boolean paused = false;
 float playSpeed = 1.0, mt;
+String currentKey = "void";
+String currentSubtitle = "void";
 
 String srtName = "Ready-Player-One-Trailer-HD-English-French-Subtitles.srt";
-SubtitlePlayer sp;
+SubtitleP sp;
 
 void setup() {
   size(640, 350);
-  sp = new SubtitlePlayer(srtName);
+  sp = new SubtitleP(srtName);
   frameRate(30);
   m = new Movie(this, fname);
   m.play();
@@ -23,16 +25,35 @@ void setup() {
 }
 
 void draw() {
+  findCurrentKey(sp);
+  //println(currentKey, "   ", mt);
+  currentSubtitle = sp.subtitle.get(currentKey);
+  //println(currentSubtitle);
   background(0);
   image(m, 0, 0);
   mt = m.time()*1000;
   //sp.printSubtitle(sp.subtitle);
+  //textSize(18);
+  if (currentSubtitle != null){
+    text(currentSubtitle, 90, 300);
+  }
   textSize(24);
   text(playSpeed, 550, 330);
 }
 
 void movieEvent(Movie m){
   m.read();
+}
+
+void findCurrentKey(SubtitleP sp){
+  String[] keys = sp.subtitle.keyArray();
+  for(int i = 0; i < keys.length; i++){
+    //compares key values to mt and updates currentKey value
+    if(sp.parseTime(sp.createEndTimeArr(keys[i])) > mt 
+       && sp.parseTime(sp.createStartTimeArr(keys[i])) < mt){
+         currentKey = keys[i];
+    }
+  }
 }
 
 void mouseWheel (MouseEvent event){
@@ -65,7 +86,7 @@ void keyReleased() {
     if(playSpeed > 0){
       playSpeed = -1.0;
     }else{
-      playSpeed = 0;
+      playSpeed = 1.0;
     }
     m.speed(playSpeed);
   }
